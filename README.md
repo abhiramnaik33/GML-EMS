@@ -33,3 +33,27 @@ This system is designed to organize tournaments like:
 ---
 
 ## 📂 Project Structure
+/GM-League
+│── app.py # Main Flask application
+│── /templates # HTML templates
+│── /static # CSS, JS, Images
+│── /database # Database files
+│── /uploads # Player photos
+│── README.md # Documentation
+
+
+---
+
+## 👨‍💻 Contributors
+- **Abhiram Girish Naik** – Project Lead & Developer  
+
+---
+
+## ⚡ How to Run
+1. Clone this repository  
+   ```bash
+   git clone https://github.com/your-username/gm-league.git
+   cd gm-league
+2.pip install -r requirements.txt
+3.python app.py
+4.Open in browser: http://127.0.0.1:xxxx/
