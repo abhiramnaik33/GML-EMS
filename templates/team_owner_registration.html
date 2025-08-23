@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Team Owner Registration - GM League Season 2</title>
+    <style>
+        :root {
+            --primary-maroon: #4a1717;
+            --primary-gold: #d4a017;
+            --secondary-gold: #f1c453;
+            --background-dark: #f0e9e9;
+            --white: #ffffff;
+        }
+
+        html, body, div, section, form, input, label, p, h2 {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background: var(--background-dark);
+            color: var(--primary-maroon);
+            font-family: 'Arial', sans-serif;
+            line-height: 1.6;
+        }
+
+        /* Main Content */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: clamp(2rem, 5vw, 4rem) clamp(1rem, 3vw, 2rem);
+        }
+
+        .registration-section {
+            background: var(--white);
+            padding: clamp(2rem, 5vw, 3rem);
+            margin-bottom: 2rem;
+            border-radius: 15px;
+        }
+
+        h2 {
+            font-size: clamp(1.8rem, 4vw, 2.5rem);
+            color: var(--primary-maroon);
+            margin-bottom: 1.5rem;
+            text-align: center;
+        }
+
+        h2::after {
+            content: '';
+            display: block;
+            width: 80px;
+            height: 4px;
+            background: linear-gradient(90deg, var(--primary-gold), var(--secondary-gold));
+            margin: 0.8rem auto;
+            border-radius: 2px;
+        }
+
+        /* Flash Messages */
+        .flash-message {
+            background: linear-gradient(135deg, var(--secondary-gold), var(--primary-gold));
+            color: var(--primary-maroon);
+            padding: 0.8rem 1.5rem;
+            border-radius: 8px;
+            margin-bottom: 1.5rem;
+            text-align: center;
+            font-weight: bold;
+        }
+
+        .error-message {
+            background: linear-gradient(135deg, #e63946, #d62839);
+            color: var(--white);
+            padding: 0.8rem 1.5rem;
+            border-radius: 8px;
+            margin-bottom: 1.5rem;
+            text-align: center;
+            font-weight: bold;
+        }
+
+        /* Form Styling */
+        form {
+            display: flex;
+            flex-direction: column;
+            gap: 1.2rem;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        label {
+            font-size: clamp(0.9rem, 2vw, 1.1rem);
+            color: var(--primary-maroon);
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            display: block;
+        }
+
+        input[type="text"],
+        input[type="email"],
+        input[type="file"] {
+            width: 100%;
+            padding: 0.8rem;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            font-size: clamp(0.9rem, 2vw, 1rem);
+            color: #333;
+            background: #fafafa;
+            transition: border-color 0.3s;
+        }
+
+        input[type="text"]:focus,
+        input[type="email"]:focus,
+        input[type="file"]:focus {
+            border-color: var(--primary-gold);
+            outline: none;
+        }
+
+        input[type="checkbox"] {
+            margin-right: 0.5rem;
+        }
+
+        .checkbox-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.8rem;
+            margin-bottom: 1rem;
+        }
+
+        .terms-label {
+            display: flex;
+            align-items: center;
+            font-size: clamp(0.9rem, 2vw, 1rem);
+            color: #666;
+        }
+
+        .terms-label a {
+            color: var(--primary-maroon);
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .terms-label a:hover,
+        .terms-label a:focus {
+            color: var(--primary-gold);
+        }
+
+        input[type="submit"] {
+            background: linear-gradient(135deg, var(--primary-gold), var(--secondary-gold));
+            color: var(--primary-maroon);
+            padding: 0.8rem 1.5rem;
+            border: none;
+            border-radius: 20px;
+            font-weight: bold;
+            font-size: clamp(0.9rem, 2vw, 1rem);
+            cursor: pointer;
+            transition: transform 0.3s;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        input[type="submit"]:hover,
+        input[type="submit"]:focus {
+            transform: scale(1.05);
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .registration-section {
+                padding: 1.5rem;
+            }
+
+            form {
+                max-width: 100%;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .container {
+                padding: 1.5rem 0.8rem;
+            }
+
+            h2 {
+                font-size: clamp(1.5rem, 6vw, 2rem);
+            }
+
+            label, input, .terms-label {
+                font-size: clamp(0.8rem, 2.5vw, 0.9rem);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <section class="registration-section">
+            <h2>Team Owner Registration</h2>
+
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    {% for category, message in messages %}
+                        <p class="{% if category == 'success' %}flash-message{% else %}error-message{% endif %}">{{ message }}</p>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+
+            <form method="POST" enctype="multipart/form-data">
+                <label for="name">Name:</label>
+                <input type="text" name="name" id="name" required>
+
+                <label for="team_name">Team Name:</label>
+                <input type="text" name="team_name" id="team_name" required>
+
+                <label for="designation">Designation:</label>
+                <input type="text" name="designation" id="designation" required>
+
+                <label for="contact">Contact:</label>
+                <input type="text" name="contact" id="contact" required>
+
+                <label for="email">Email:</label>
+                <input type="email" name="email" id="email" required>
+
+                <label for="manager_name">Manager Name:</label>
+                <input type="text" name="manager_name" id="manager_name" required>
+
+                <label for="manager_contact_number">Manager Contact Number:</label>
+                <input type="text" name="manager_contact_number" id="manager_contact_number" required>
+
+                <label for="team_owner_photo">Team Owner Photo:</label>
+                <input type="file" name="team_owner_photo" id="team_owner_photo" accept="image/*" required>
+
+                <label for="team_logo">Team Logo:</label>
+                <input type="file" name="team_logo" id="team_logo" accept="image/*" required>
+
+                <label>Select Sport(s):</label>
+                <div class="checkbox-group">
+                    <label><input type="checkbox" name="sports" value="Football(Men)"> Football (Men)</label>
+                    <label><input type="checkbox" name="sports" value="Basketball(Men)"> Basketball (Men)</label>
+                    <label><input type="checkbox" name="sports" value="Basketball(Women)"> Basketball (Women)</label>
+                    <label><input type="checkbox" name="sports" value="Kabaddi(Men)"> Kabaddi (Men)</label>
+                    <label><input type="checkbox" name="sports" value="Kabaddi(Women)"> Kabaddi (Women)</label>
+                    <label><input type="checkbox" name="sports" value="Badminton(Men)"> Badminton (Men)</label>
+                    <label><input type="checkbox" name="sports" value="Badminton(Women)"> Badminton (Women)</label>
+                </div>
+
+                <label class="terms-label">
+                    <input type="checkbox" name="terms_accepted" required>
+                    I accept the <a href="{{ url_for('terms') }}" target="_blank" aria-label="View Terms and Conditions">Terms and Conditions</a>
+                </label>
+
+                <input type="submit" value="Register" aria-label="Submit Team Owner Registration">
+            </form>
+        </section>
+    </div>
+</body>
+</html>

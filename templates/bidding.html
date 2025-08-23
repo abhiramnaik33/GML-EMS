@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ sport }} Bidding ({{ gender }})</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .carousel-container {
+            position: relative;
+            max-width: 1000px;
+            margin: auto;
+            overflow: hidden;
+        }
+        .carousel-slide {
+            display: none;
+            transition: opacity 0.5s ease-in-out;
+        }
+        .carousel-slide.active {
+            display: flex;
+            align-items: stretch;
+        }
+        .photo-rectangle {
+            width: 300px;
+            height: 400px;
+            background-color: #f3f4f6;
+            border: 2px solid #e5e7eb;
+            border-radius: 8px;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .photo-rectangle img {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: cover;
+        }
+        .nav-button {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            background: rgba(0, 0, 0, 0.5);
+            color: white;
+            padding: 10px;
+            cursor: pointer;
+            z-index: 10;
+        }
+        .prev {
+            left: 10px;
+        }
+        .next {
+            right: 10px;
+        }
+    </style>
+</head>
+<body class="bg-gray-100">
+    <div class="container mx-auto p-4">
+        <h1 class="text-3xl font-bold text-center mb-6">{{ sport }} Bidding ({{ gender }})</h1>
+        
+        <!-- Gender Navigation (except for Football) -->
+        {% if sport != 'Football' %}
+        <div class="flex justify-center mb-4">
+            <a href="{{ url_for('bidding', sport=sport.lower(), gender='male') }}"
+               class="px-4 py-2 mx-2 rounded {{ 'bg-blue-500 text-white' if gender == 'Male' else 'bg-gray-200' }}">Men</a>
+            <a href="{{ url_for('bidding', sport=sport.lower(), gender='female') }}"
+               class="px-4 py-2 mx-2 rounded {{ 'bg-blue-500 text-white' if gender == 'Female' else 'bg-gray-200' }}">Women</a>
+        </div>
+        {% endif %}
+
+        <!-- Flash Messages -->
+        {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+        <div class="mb-4">
+            {% for category, message in messages %}
+            <div class="p-4 rounded {{ 'bg-green-100 text-green-700' if category == 'success' else 'bg-red-100 text-red-700' }}">
+                {{ message }}
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+        {% endwith %}
+
+        <!-- Carousel -->
+        <div class="carousel-container">
+            {% if players %}
+            {% for player in players %}
+            <div class="carousel-slide {{ 'active' if loop.first else '' }}" data-player-id="{{ player.id }}">
+                <div class="flex flex-col md:flex-row gap-6 bg-white p-6 rounded-lg shadow-lg">
+                    <!-- Photo Rectangle (Left) -->
+                    <div class="photo-rectangle">
+                        <img src="{{ '/static/' + player.photo if player.photo else '/static/player_photos/default.png' }}"
+                             alt="{{ player.name }} Photo" class="object-cover">
+                    </div>
+
+                    <!-- Details (Right) -->
+                    <div class="flex-1">
+                        <h2 class="text-2xl font-semibold mb-2">{{ player.name }}</h2>
+                        <div class="grid grid-cols-2 gap-2 text-gray-600">
+                            <p><strong>Position:</strong> {{ player.position or 'N/A' }}</p>
+                            <p><strong>Branch:</strong> {{ player.branch or 'N/A' }}</p>
+                            <p><strong>USN:</strong> {{ player.usn or 'N/A' }}</p>
+                            <p><strong>College:</strong> {{ player.college_name or 'N/A' }}</p>
+                            <p><strong>Experience:</strong> {{ player.experience or 'N/A' }}</p>
+                            <p><strong>Achievements:</strong> {{ player.achievements or 'None' }}</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Bidding Form (Below) -->
+                <div class="mt-6 p-4 bg-gray-50 rounded-lg shadow-inner">
+                    <form action="{{ url_for('bidding', sport=sport.lower(), gender=gender.lower()) }}" method="POST" class="space-y-4">
+                        <input type="hidden" name="player_id" value="{{ player.id }}">
+                        <div>
+                            <label for="owner_id" class="block text-gray-700 font-medium">Select Team Owner:</label>
+                            <select name="owner_id" class="w-full p-2 border rounded">
+                                {% for owner in owners %}
+                                <option value="{{ owner.id }}">{{ owner.team_name }} (Budget: {{ owner.budget }})</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div>
+                            <label for="bid_amount" class="block text-gray-700 font-medium">Bid Amount:</label>
+                            <input type="number" name="bid_amount" class="w-full p-2 border rounded" min="1" required>
+                        </div>
+                        <button type="submit" class="w-full bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition duration-200">Place Bid</button>
+                    </form>
+                </div>
+            </div>
+            {% endfor %}
+            <div class="nav-button prev" onclick="moveSlide(-1)">&#10094;</div>
+            <div class="nav-button next" onclick="moveSlide(1)">&#10095;</div>
+            {% else %}
+            <p class="text-center text-gray-600">No unsold players available for bidding.</p>
+            {% endif %}
+        </div>
+
+        <div class="text-center mt-4">
+            <a href="{{ url_for('index') }}" class="text-blue-500 hover:underline">Back to Home</a>
+        </div>
+    </div>
+
+    <script>
+        let currentSlide = 0;
+        const slides = document.querySelectorAll('.carousel-slide');
+
+        function showSlide(index) {
+            if (index >= slides.length) currentSlide = 0;
+            else if (index < 0) currentSlide = slides.length - 1;
+            else currentSlide = index;
+
+            slides.forEach((slide, i) => {
+                slide.classList.toggle('active', i === currentSlide);
+            });
+        }
+
+        function moveSlide(direction) {
+            showSlide(currentSlide + direction);
+        }
+
+        // Auto-advance carousel every 10 seconds (optional)
+        // setInterval(() => moveSlide(1), 10000);
+    </script>
+</body>
+</html>

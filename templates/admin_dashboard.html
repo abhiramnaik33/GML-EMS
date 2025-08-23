@@ -1,0 +1,601 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .sidebar {
+            height: 100vh;
+            position: fixed;
+            width: 250px;
+            background: linear-gradient(135deg, #2d3748, #4a5b7c);
+            padding-top: 20px;
+            transition: transform 0.3s ease;
+        }
+        .sidebar.collapsed {
+            transform: translateX(-250px);
+        }
+        .content {
+            margin-left: 250px;
+            padding: 20px;
+            transition: margin-left 0.3s ease;
+        }
+        .content.collapsed {
+            margin-left: 0;
+        }
+        .card {
+            background: white;
+            border-radius: 12px;
+            padding: 1.5rem;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 6px 18px rgba(0, 0, 0, 0.15);
+        }
+        .table-header {
+            background: linear-gradient(90deg, #3b82f6, #60a5fa);
+            color: white;
+            border-top-left-radius: 8px;
+            border-top-right-radius: 8px;
+        }
+        .export-btn {
+            background: #10b981;
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            transition: background 0.3s ease;
+        }
+        .export-btn:hover {
+            background: #059669;
+        }
+        .player-photo, .team-logo, .owner-photo {
+            width: 50px;
+            height: 50px;
+            object-fit: cover;
+            border-radius: 8px;
+        }
+        .toggle-section {
+            display: none;
+        }
+        .toggle-section.active {
+            display: block;
+        }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-gray-50 to-gray-200 min-h-screen font-sans">
+    <!-- Sidebar -->
+    <div class="sidebar text-white">
+        <h2 class="text-2xl font-bold text-center mb-6">Admin Panel</h2>
+        <ul class="space-y-4">
+            <li><a href="#" class="block px-4 py-2 hover:bg-gray-700 rounded toggle-btn" data-target="dashboard">Dashboard</a></li>
+            <li><a href="#" class="block px-4 py-2 hover:bg-gray-700 rounded toggle-btn" data-target="football">Football Data</a></li>
+            <li><a href="#" class="block px-4 py-2 hover:bg-gray-700 rounded toggle-btn" data-target="kabaddi">Kabaddi Data</a></li>
+            <li><a href="#" class="block px-4 py-2 hover:bg-gray-700 rounded toggle-btn" data-target="basketball">Basketball Data</a></li>
+            <li><a href="#" class="block px-4 py-2 hover:bg-gray-700 rounded toggle-btn" data-target="badminton">Badminton Data</a></li>
+            <li><a href="#" class="block px-4 py-2 hover:bg-gray-700 rounded toggle-btn" data-target="owners">Team Owners Data</a></li>
+            <li><a href="{{ url_for('export_all_summaries') }}" class="block px-4 py-2 hover:bg-gray-700 rounded" onclick="return confirm('Export all summaries to Excel?');">Export All Summaries</a></li>
+            <li><a href="{{ url_for('admin_logout') }}" class="block px-4 py-2 hover:bg-gray-700 rounded">Logout</a></li>
+        </ul>
+    </div>
+
+    <!-- Main Content -->
+    <div class="content">
+        <button id="toggleSidebar" class="mb-4 bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition duration-200">Toggle Sidebar</button>
+        <h1 class="text-4xl font-bold mb-8 text-gray-900">Admin Dashboard</h1>
+
+        <!-- Flash Messages -->
+        {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+        <div class="mb-6">
+            {% for category, message in messages %}
+            <div class="p-4 rounded-lg {{ 'bg-green-100 text-green-700' if category == 'success' else 'bg-red-100 text-red-700' }} text-center shadow-md">
+                {{ message }}
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+        {% endwith %}
+
+        <!-- Dashboard Section -->
+        <div id="dashboard" class="toggle-section active">
+            <!-- Summary Cards -->
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+                <div class="card text-center">
+                    <h3 class="text-lg font-semibold text-gray-700">Total Players</h3>
+                    <p class="text-3xl font-bold">{{ football_players|length + kabaddi_players|length + basketball_players|length + badminton_players|length }}</p>
+                </div>
+                <div class="card text-center">
+                    <h3 class="text-lg font-semibold text-gray-700">Sold Players</h3>
+                    <p class="text-3xl font-bold">{{ sold_players|length }}</p>
+                </div>
+                <div class="card text-center">
+                    <h3 class="text-lg font-semibold text-gray-700">Total Owners</h3>
+                    <p class="text-3xl font-bold">{{ owners|length }}</p>
+                </div>
+                <div class="card text-center">
+                    <h3 class="text-lg font-semibold text-gray-700">Available Budget</h3>
+                    <p class="text-3xl font-bold">{{ owners|map(attribute='budget')|sum }}</p>
+                </div>
+            </div>
+
+            <!-- Players by Sport -->
+            <h2 class="text-2xl font-semibold mb-6 text-gray-800">Players by Sport</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+                {% for sport, players in [('Football', football_players), ('Kabaddi', kabaddi_players), ('Basketball', basketball_players), ('Badminton', badminton_players)] %}
+                <div class="card">
+                    <h3 class="text-xl font-medium mb-4 text-gray-800">{{ sport }} Players</h3>
+                    {% if players %}
+                    <table class="w-full">
+                        <thead class="table-header">
+                            <tr>
+                                <th class="p-2">Name</th>
+                                <th class="p-2">Gender</th>
+                                <th class="p-2">Position</th>
+                                <th class="p-2">Sold</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for player in players %}
+                            <tr class="border-b hover:bg-gray-50">
+                                <td class="p-2">{{ player.name }}</td>
+                                <td class="p-2">{{ player.gender }}</td>
+                                <td class="p-2">{{ player.position or 'N/A' }}</td>
+                                <td class="p-2">{{ 'Yes' if player.sold else 'No' }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                    {% else %}
+                    <p class="text-gray-600">No players registered for {{ sport }}.</p>
+                    {% endif %}
+                </div>
+                {% endfor %}
+            </div>
+
+            <!-- Team Owners -->
+            <h2 class="text-2xl font-semibold mb-6 text-gray-800">Team Owners</h2>
+            <div class="card mb-6">
+                <div class="flex justify-between items-center mb-4">
+                    <h3 class="text-xl font-medium text-gray-800">Team Owners List</h3>
+                    <a href="{{ url_for('export_owners') }}" class="export-btn" onclick="return confirm('Export team owners to Excel?');">Export as Excel</a>
+                </div>
+                {% if owners %}
+                <table class="w-full">
+                    <thead class="table-header">
+                        <tr>
+                            <th class="p-2">Team Name</th>
+                            <th class="p-2">Owner</th>
+                            <th class="p-2">Budget</th>
+                            <th class="p-2">Sports</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for owner in owners %}
+                        <tr class="border-b hover:bg-gray-50">
+                            <td class="p-2">{{ owner.team_name }}</td>
+                            <td class="p-2">{{ owner.name }}</td>
+                            <td class="p-2">{{ owner.budget }}</td>
+                            <td class="p-2">{{ owner.sports }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+                {% else %}
+                <p class="text-gray-600">No team owners registered.</p>
+                {% endif %}
+            </div>
+
+            <!-- Sold Players by Sport -->
+            <h2 class="text-2xl font-semibold mb-6 text-gray-800">Sold Players by Sport</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {% for sport in ['Football', 'Kabaddi', 'Basketball', 'Badminton'] %}
+                {% set sold_players_sport = sold_players | selectattr('sport', 'equalto', sport) | list %}
+                <div class="card">
+                    <h3 class="text-xl font-medium mb-4 text-gray-800">{{ sport }} Sold Players</h3>
+                    {% if sold_players_sport %}
+                    <table class="w-full">
+                        <thead class="table-header">
+                            <tr>
+                                <th class="p-2">Name</th>
+                                <th class="p-2">Gender</th>
+                                <th class="p-2">Sold To</th>
+                                <th class="p-2">Bid Amount</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for player in sold_players_sport %}
+                            <tr class="border-b hover:bg-gray-50">
+                                <td class="p-2">{{ player.name }}</td>
+                                <td class="p-2">{{ player.gender }}</td>
+                                <td class="p-2">{{ player.sold_to or 'N/A' }}</td>
+                                <td class="p-2">{{ player.bid_amount or 'N/A' }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                    {% else %}
+                    <p class="text-gray-600">No players sold for {{ sport }}.</p>
+                    {% endif %}
+                </div>
+                {% endfor %}
+            </div>
+
+            <!-- Export Summaries -->
+            <h2 class="text-2xl font-semibold mt-8 mb-6 text-gray-800">Export Summaries</h2>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <a href="{{ url_for('export_summary', sport='Football') }}" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition duration-200 text-center" onclick="return confirm('Export Football summary to Excel?');">Export Football</a>
+                <a href="{{ url_for('export_summary', sport='Kabaddi') }}" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition duration-200 text-center" onclick="return confirm('Export Kabaddi summary to Excel?');">Export Kabaddi</a>
+                <a href="{{ url_for('export_summary', sport='Basketball') }}" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition duration-200 text-center" onclick="return confirm('Export Basketball summary to Excel?');">Export Basketball</a>
+                <a href="{{ url_for('export_summary', sport='Badminton') }}" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition duration-200 text-center" onclick="return confirm('Export Badminton summary to Excel?');">Export Badminton</a>
+                <a href="{{ url_for('export_all_summaries') }}" class="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition duration-200 text-center" onclick="return confirm('Export all summaries to Excel?');">Export All</a>
+            </div>
+        </div>
+
+        <!-- Football Data Section -->
+        <div id="football" class="toggle-section">
+            <h2 class="text-2xl font-semibold mb-6 text-gray-800">Football Players</h2>
+            <div class="card">
+                {% if football_players %}
+                <table class="w-full">
+                    <thead class="table-header">
+                        <tr>
+                            <th class="p-2">Photo</th>
+                            <th class="p-2">Name</th>
+                            <th class="p-2">Branch</th>
+                            <th class="p-2">USN</th>
+                            <th class="p-2">College</th>
+                            <th class="p-2">Position</th>
+                            <th class="p-2">Contact</th>
+                            <th class="p-2">Achievements</th>
+                            <th class="p-2">Experience</th>
+                            <th class="p-2">Gender</th>
+                            <th class="p-2">Sold</th>
+                            <th class="p-2">Bid Amount</th>
+                            <th class="p-2">Sold To</th>
+                            <th class="p-2">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for player in football_players %}
+                        <tr class="border-b hover:bg-gray-50">
+                            <td class="p-2">
+                                {% if player.photo %}
+                                <img src="{{ url_for('static', filename=player.photo) }}" class="player-photo" alt="{{ player.name }} Photo">
+                                {% else %}
+                                N/A
+                                {% endif %}
+                            </td>
+                            <td class="p-2">{{ player.name }}</td>
+                            <td class="p-2">{{ player.branch or 'N/A' }}</td>
+                            <td class="p-2">{{ player.usn or 'N/A' }}</td>
+                            <td class="p-2">{{ player.college_name or 'N/A' }}</td>
+                            <td class="p-2">{{ player.position or 'N/A' }}</td>
+                            <td class="p-2">{{ player.contact or 'N/A' }}</td>
+                            <td class="p-2">{{ player.achievements or 'None' }}</td>
+                            <td class="p-2">{{ player.experience or 'N/A' }}</td>
+                            <td class="p-2">{{ player.gender }}</td>
+                            <td class="p-2">{{ 'Yes' if player.sold else 'No' }}</td>
+                            <td class="p-2">{{ player.bid_amount or 'N/A' }}</td>
+                            <td class="p-2">{{ player.sold_to or 'Not Sold' }}</td>
+                            <td class="p-2">
+                                <a href="{{ url_for('admin_edit_player', id=player.id) }}" class="text-blue-600 hover:underline">Edit</a>
+                                <form action="{{ url_for('admin_delete_player', id=player.id) }}" method="POST" class="inline">
+                                    <button type="submit" class="text-red-600 hover:underline" onclick="return confirm('Delete player {{ player.name }}?');">Delete</button>
+                                </form>
+                                {% if player.sold %}
+                                <form action="{{ url_for('admin_reset_bid', player_id=player.id) }}" method="POST" class="inline">
+                                    <button type="submit" class="text-yellow-600 hover:underline" onclick="return confirm('Reset bid for {{ player.name }}?');">Reset Bid</button>
+                                </form>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+                {% else %}
+                <p class="text-gray-600">No players registered for Football.</p>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Kabaddi Data Section -->
+        <div id="kabaddi" class="toggle-section">
+            <h2 class="text-2xl font-semibold mb-6 text-gray-800">Kabaddi Players</h2>
+            <div class="card">
+                {% if kabaddi_players %}
+                <table class="w-full">
+                    <thead class="table-header">
+                        <tr>
+                            <th class="p-2">Photo</th>
+                            <th class="p-2">Name</th>
+                            <th class="p-2">Branch</th>
+                            <th class="p-2">USN</th>
+                            <th class="p-2">College</th>
+                            <th class="p-2">Position</th>
+                            <th class="p-2">Contact</th>
+                            <th class="p-2">Achievements</th>
+                            <th class="p-2">Experience</th>
+                            <th class="p-2">Gender</th>
+                            <th class="p-2">Sold</th>
+                            <th class="p-2">Bid Amount</th>
+                            <th class="p-2">Sold To</th>
+                            <th class="p-2">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for player in kabaddi_players %}
+                        <tr class="border-b hover:bg-gray-50">
+                            <td class="p-2">
+                                {% if player.photo %}
+                                <img src="{{ url_for('static', filename=player.photo) }}" class="player-photo" alt="{{ player.name }} Photo">
+                                {% else %}
+                                N/A
+                                {% endif %}
+                            </td>
+                            <td class="p-2">{{ player.name }}</td>
+                            <td class="p-2">{{ player.branch or 'N/A' }}</td>
+                            <td class="p-2">{{ player.usn or 'N/A' }}</td>
+                            <td class="p-2">{{ player.college_name or 'N/A' }}</td>
+                            <td class="p-2">{{ player.position or 'N/A' }}</td>
+                            <td class="p-2">{{ player.contact or 'N/A' }}</td>
+                            <td class="p-2">{{ player.achievements or 'None' }}</td>
+                            <td class="p-2">{{ player.experience or 'N/A' }}</td>
+                            <td class="p-2">{{ player.gender }}</td>
+                            <td class="p-2">{{ 'Yes' if player.sold else 'No' }}</td>
+                            <td class="p-2">{{ player.bid_amount or 'N/A' }}</td>
+                            <td class="p-2">{{ player.sold_to or 'Not Sold' }}</td>
+                            <td class="p-2">
+                                <a href="{{ url_for('admin_edit_player', id=player.id) }}" class="text-blue-600 hover:underline">Edit</a>
+                                <form action="{{ url_for('admin_delete_player', id=player.id) }}" method="POST" class="inline">
+                                    <button type="submit" class="text-red-600 hover:underline" onclick="return confirm('Delete player {{ player.name }}?');">Delete</button>
+                                </form>
+                                {% if player.sold %}
+                                <form action="{{ url_for('admin_reset_bid', player_id=player.id) }}" method="POST" class="inline">
+                                    <button type="submit" class="text-yellow-600 hover:underline" onclick="return confirm('Reset bid for {{ player.name }}?');">Reset Bid</button>
+                                </form>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+                {% else %}
+                <p class="text-gray-600">No players registered for Kabaddi.</p>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Basketball Data Section -->
+        <div id="basketball" class="toggle-section">
+            <h2 class="text-2xl font-semibold mb-6 text-gray-800">Basketball Players</h2>
+            <div class="card">
+                {% if basketball_players %}
+                <table class="w-full">
+                    <thead class="table-header">
+                        <tr>
+                            <th class="p-2">Photo</th>
+                            <th class="p-2">Name</th>
+                            <th class="p-2">Branch</th>
+                            <th class="p-2">USN</th>
+                            <th class="p-2">College</th>
+                            <th class="p-2">Position</th>
+                            <th class="p-2">Contact</th>
+                            <th class="p-2">Achievements</th>
+                            <th class="p-2">Experience</th>
+                            <th class="p-2">Gender</th>
+                            <th class="p-2">Sold</th>
+                            <th class="p-2">Bid Amount</th>
+                            <th class="p-2">Sold To</th>
+                            <th class="p-2">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for player in basketball_players %}
+                        <tr class="border-b hover:bg-gray-50">
+                            <td class="p-2">
+                                {% if player.photo %}
+                                <img src="{{ url_for('static', filename=player.photo) }}" class="player-photo" alt="{{ player.name }} Photo">
+                                {% else %}
+                                N/A
+                                {% endif %}
+                            </td>
+                            <td class="p-2">{{ player.name }}</td>
+                            <td class="p-2">{{ player.branch or 'N/A' }}</td>
+                            <td class="p-2">{{ player.usn or 'N/A' }}</td>
+                            <td class="p-2">{{ player.college_name or 'N/A' }}</td>
+                            <td class="p-2">{{ player.position or 'N/A' }}</td>
+                            <td class="p-2">{{ player.contact or 'N/A' }}</td>
+                            <td class="p-2">{{ player.achievements or 'None' }}</td>
+                            <td class="p-2">{{ player.experience or 'N/A' }}</td>
+                            <td class="p-2">{{ player.gender }}</td>
+                            <td class="p-2">{{ 'Yes' if player.sold else 'No' }}</td>
+                            <td class="p-2">{{ player.bid_amount or 'N/A' }}</td>
+                            <td class="p-2">{{ player.sold_to or 'Not Sold' }}</td>
+                            <td class="p-2">
+                                <a href="{{ url_for('admin_edit_player', id=player.id) }}" class="text-blue-600 hover:underline">Edit</a>
+                                <form action="{{ url_for('admin_delete_player', id=player.id) }}" method="POST" class="inline">
+                                    <button type="submit" class="text-red-600 hover:underline" onclick="return confirm('Delete player {{ player.name }}?');">Delete</button>
+                                </form>
+                                {% if player.sold %}
+                                <form action="{{ url_for('admin_reset_bid', player_id=player.id) }}" method="POST" class="inline">
+                                    <button type="submit" class="text-yellow-600 hover:underline" onclick="return confirm('Reset bid for {{ player.name }}?');">Reset Bid</button>
+                                </form>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+                {% else %}
+                <p class="text-gray-600">No players registered for Basketball.</p>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Badminton Data Section -->
+        <div id="badminton" class="toggle-section">
+            <h2 class="text-2xl font-semibold mb-6 text-gray-800">Badminton Players</h2>
+            <div class="card">
+                {% if badminton_players %}
+                <table class="w-full">
+                    <thead class="table-header">
+                        <tr>
+                            <th class="p-2">Photo</th>
+                            <th class="p-2">Name</th>
+                            <th class="p-2">Branch</th>
+                            <th class="p-2">USN</th>
+                            <th class="p-2">College</th>
+                            <th class="p-2">Contact</th>
+                            <th class="p-2">Achievements</th>
+                            <th class="p-2">Experience</th>
+                            <th class="p-2">Gender</th>
+                            <th class="p-2">Sold</th>
+                            <th class="p-2">Bid Amount</th>
+                            <th class="p-2">Sold To</th>
+                            <th class="p-2">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for player in badminton_players %}
+                        <tr class="border-b hover:bg-gray-50">
+                            <td class="p-2">
+                                {% if player.photo %}
+                                <img src="{{ url_for('static', filename=player.photo) }}" class="player-photo" alt="{{ player.name }} Photo">
+                                {% else %}
+                                N/A
+                                {% endif %}
+                            </td>
+                            <td class="p-2">{{ player.name }}</td>
+                            <td class="p-2">{{ player.branch or 'N/A' }}</td>
+                            <td class="p-2">{{ player.usn or 'N/A' }}</td>
+                            <td class="p-2">{{ player.college_name or 'N/A' }}</td>
+                            <td class="p-2">{{ player.contact or 'N/A' }}</td>
+                            <td class="p-2">{{ player.achievements or 'None' }}</td>
+                            <td class="p-2">{{ player.experience or 'N/A' }}</td>
+                            <td class="p-2">{{ player.gender }}</td>
+                            <td class="p-2">{{ 'Yes' if player.sold else 'No' }}</td>
+                            <td class="p-2">{{ player.bid_amount or 'N/A' }}</td>
+                            <td class="p-2">{{ player.sold_to or 'Not Sold' }}</td>
+                            <td class="p-2">
+                                <a href="{{ url_for('admin_edit_player', id=player.id) }}" class="text-blue-600 hover:underline">Edit</a>
+                                <form action="{{ url_for('admin_delete_player', id=player.id) }}" method="POST" class="inline">
+                                    <button type="submit" class="text-red-600 hover:underline" onclick="return confirm('Delete player {{ player.name }}?');">Delete</button>
+                                </form>
+                                {% if player.sold %}
+                                <form action="{{ url_for('admin_reset_bid', player_id=player.id) }}" method="POST" class="inline">
+                                    <button type="submit" class="text-yellow-600 hover:underline" onclick="return confirm('Reset bid for {{ player.name }}?');">Reset Bid</button>
+                                </form>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+                {% else %}
+                <p class="text-gray-600">No players registered for Badminton.</p>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Team Owners Data Section -->
+        <div id="owners" class="toggle-section">
+            <h2 class="text-2xl font-semibold mb-6 text-gray-800">Team Owners</h2>
+            <div class="card">
+                <div class="flex justify-between items-center mb-4">
+                    <h3 class="text-xl font-medium text-gray-800">Team Owners List</h3>
+                    <a href="{{ url_for('export_owners') }}" class="export-btn" onclick="return confirm('Export team owners to Excel?');">Export as Excel</a>
+                </div>
+                {% if owners %}
+                <table class="w-full">
+                    <thead class="table-header">
+                        <tr>
+                            <th class="p-2">Team Logo</th>
+                            <th class="p-2">Owner Photo</th>
+                            <th class="p-2">Team Name</th>
+                            <th class="p-2">Owner Name</th>
+                            <th class="p-2">Sports</th>
+                            <th class="p-2">Budget</th>
+                            <th class="p-2">Contact</th>
+                            <th class="p-2">Designation</th>
+                            <th class="p-2">Email</th>
+                            <th class="p-2">Manager Name</th>
+                            <th class="p-2">Manager Contact</th>
+                            <th class="p-2">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for owner in owners %}
+                        <tr class="border-b hover:bg-gray-50">
+                            <td class="p-2">
+                                {% if owner.team_logo %}
+                                <img src="{{ url_for('static', filename=owner.team_logo) }}" class="team-logo" alt="{{ owner.team_name }} Logo">
+                                {% else %}
+                                N/A
+                                {% endif %}
+                            </td>
+                            <td class="p-2">
+                                {% if owner.team_owner_photo %}
+                                <img src="{{ url_for('static', filename=owner.team_owner_photo) }}" class="owner-photo" alt="{{ owner.name }} Photo">
+                                {% else %}
+                                N/A
+                                {% endif %}
+                            </td>
+                            <td class="p-2">{{ owner.team_name }}</td>
+                            <td class="p-2">{{ owner.name }}</td>
+                            <td class="p-2">{{ owner.sports }}</td>
+                            <td class="p-2">{{ owner.budget }}</td>
+                            <td class="p-2">{{ owner.contact or 'N/A' }}</td>
+                            <td class="p-2">{{ owner.designation or 'N/A' }}</td>
+                            <td class="p-2">{{ owner.email or 'N/A' }}</td>
+                            <td class="p-2">{{ owner.manager_name or 'N/A' }}</td>
+                            <td class="p-2">{{ owner.manager_contact_number or 'N/A' }}</td>
+                            <td class="p-2">
+                                <a href="{{ url_for('admin_edit_team_owner', id=owner.id) }}" class="text-blue-600 hover:underline">Edit</a>
+                                <form action="{{ url_for('admin_delete_owner', id=owner.id) }}" method="POST" class="inline">
+                                    <button type="submit" class="text-red-600 hover:underline" onclick="return confirm('Delete team owner {{ owner.team_name }}?');">Delete</button>
+                                </form>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+                {% else %}
+                <p class="text-gray-600">No team owners registered.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const toggleSidebarBtn = document.getElementById('toggleSidebar');
+        const sidebar = document.querySelector('.sidebar');
+        const content = document.querySelector('.content');
+        const toggleButtons = document.querySelectorAll('.toggle-btn');
+        const sections = document.querySelectorAll('.toggle-section');
+
+        toggleSidebarBtn.addEventListener('click', () => {
+            sidebar.classList.toggle('collapsed');
+            content.classList.toggle('collapsed');
+        });
+
+        toggleButtons.forEach(button => {
+            button.addEventListener('click', (e) => {
+                e.preventDefault();
+                const targetId = button.getAttribute('data-target');
+                sections.forEach(section => {
+                    section.classList.remove('active');
+                    if (section.id === targetId) {
+                        section.classList.add('active');
+                    }
+                });
+                toggleButtons.forEach(btn => btn.classList.remove('bg-gray-700'));
+                button.classList.add('bg-gray-700');
+            });
+        });
+    </script>
+</body>
+</html>

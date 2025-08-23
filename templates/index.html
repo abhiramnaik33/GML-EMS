@@ -1,0 +1,878 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GM League Season 2 - GM University</title>
+    <style>
+        :root {
+            --primary-maroon: #4a1717;
+            --primary-gold: #d4a017;
+            --secondary-gold: #f1c453;
+            --background-dark: #f0e9e9;
+            --text-light: #f5f5f5;
+            --white: #ffffff;
+            --dark-overlay: rgba(74, 23, 23, 0.8);
+            --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.1);
+            --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.12);
+            --transition: 0.3s ease;
+        }
+
+        *, *:before, *:after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background: var(--background-dark);
+            color: var(--primary-maroon);
+            font-family: 'Arial', sans-serif;
+            line-height: 1.6;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        main {
+            flex: 1;
+        }
+
+        /* Header */
+        .header {
+            background: linear-gradient(135deg, var(--primary-maroon), #6a2525);
+            color: var(--text-light);
+            padding: clamp(0.8rem, 2vw, 1rem);
+            box-shadow: var(--shadow-sm);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 clamp(0.8rem, 4vw, 1.5rem);
+        }
+
+        .logo {
+            font-size: clamp(1.2rem, 4vw, 1.8rem);
+            font-weight: bold;
+            color: var(--secondary-gold);
+        }
+
+        .nav {
+            display: flex;
+            gap: clamp(0.5rem, 2vw, 1rem);
+            flex-wrap: wrap;
+        }
+
+        .nav a {
+            color: var(--text-light);
+            text-decoration: none;
+            font-weight: 500;
+            padding: clamp(0.4rem, 1vw, 0.6rem) clamp(0.6rem, 2vw, 0.8rem);
+            border-radius: 4px;
+            transition: background var(--transition), color var(--transition);
+            font-size: clamp(0.8rem, 2.5vw, 0.9rem);
+        }
+
+        .nav a:hover, .nav a:focus {
+            background: var(--primary-gold);
+            color: var(--primary-maroon);
+        }
+
+        /* Hero Section */
+        .hero {
+            background: linear-gradient(135deg, var(--primary-maroon), #2d0a0a, var(--primary-maroon));
+            color: var(--text-light);
+            padding: clamp(2rem, 6vw, 4rem) clamp(0.8rem, 4vw, 1.5rem);
+        }
+
+        .hero-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: clamp(1rem, 3vw, 2rem);
+            align-items: center;
+        }
+
+        .hero-content {
+            text-align: center;
+        }
+
+        .hero-badge {
+            background: linear-gradient(135deg, var(--primary-gold), var(--secondary-gold));
+            color: var(--primary-maroon);
+            padding: clamp(0.4rem, 1vw, 0.6rem) clamp(0.8rem, 2vw, 1rem);
+            border-radius: 20px;
+            font-size: clamp(0.7rem, 2vw, 0.85rem);
+            font-weight: bold;
+            margin-bottom: clamp(0.8rem, 2vw, 1rem);
+            text-transform: uppercase;
+            display: inline-block;
+        }
+
+        .hero h1 {
+            font-size: clamp(1.5rem, 5vw, 2.8rem);
+            font-weight: 900;
+            line-height: 1.2;
+            background: linear-gradient(135deg, var(--text-light), var(--secondary-gold));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            margin-bottom: clamp(0.8rem, 2vw, 1rem);
+        }
+
+        .hero-description {
+            font-size: clamp(0.85rem, 2.5vw, 1rem);
+            margin-bottom: clamp(1rem, 3vw, 1.5rem);
+            opacity: 0.9;
+        }
+
+        .hero-buttons {
+            display: flex;
+            gap: clamp(0.5rem, 2vw, 1rem);
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .cta-button {
+            background: linear-gradient(135deg, var(--primary-gold), var(--secondary-gold));
+            color: var(--primary-maroon);
+            padding: clamp(0.5rem, 1.5vw, 0.7rem) clamp(1rem, 2.5vw, 1.2rem);
+            text-decoration: none;
+            border-radius: 25px;
+            font-weight: bold;
+            font-size: clamp(0.8rem, 2vw, 0.9rem);
+            transition: transform var(--transition), box-shadow var(--transition);
+            box-shadow: var(--shadow-sm);
+        }
+
+        .cta-button:hover, .cta-button:focus {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
+        }
+
+        .cta-button.secondary {
+            background: transparent;
+            color: var(--text-light);
+            border: 2px solid var(--text-light);
+            box-shadow: none;
+        }
+
+        .cta-button.secondary:hover, .cta-button.secondary:focus {
+            background: var(--text-light);
+            color: var(--primary-maroon);
+        }
+
+        .hero-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: clamp(0.8rem, 2vw, 1rem);
+            background: rgba(255, 255, 255, 0.1);
+            padding: clamp(0.8rem, 2vw, 1.2rem);
+            border-radius: 12px;
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            margin-top: clamp(1rem, 3vw, 1.5rem);
+        }
+
+        .stat-item {
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: clamp(1.2rem, 3vw, 1.8rem);
+            font-weight: bold;
+            color: var(--secondary-gold);
+        }
+
+        .stat-label {
+            font-size: clamp(0.7rem, 2vw, 0.8rem);
+            opacity: 0.8;
+            text-transform: uppercase;
+        }
+
+        /* Main Content */
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: clamp(1rem, 3vw, 2rem) clamp(0.8rem, 3vw, 1.2rem);
+        }
+
+        h2 {
+            font-size: clamp(1.4rem, 3.5vw, 2rem);
+            color: var(--primary-maroon);
+            margin-bottom: clamp(0.8rem, 2vw, 1rem);
+            text-align: center;
+        }
+
+        h2::after {
+            content: '';
+            display: block;
+            width: clamp(40px, 10vw, 60px);
+            height: 3px;
+            background: linear-gradient(90deg, var(--primary-gold), var(--secondary-gold));
+            margin: clamp(0.4rem, 1vw, 0.6rem) auto;
+            border-radius: 2px;
+        }
+
+        .section {
+            background: var(--white);
+            padding: clamp(1rem, 3vw, 2rem);
+            margin-bottom: clamp(1rem, 3vw, 1.5rem);
+            border-radius: 12px;
+            box-shadow: var(--shadow-sm);
+        }
+
+        /* Player Registration Section */
+        .sports-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: clamp(0.8rem, 2vw, 1.2rem);
+            margin-top: clamp(0.8rem, 2vw, 1.2rem);
+        }
+
+        .sport-card {
+            background: var(--white);
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: var(--shadow-sm);
+            transition: transform var(--transition), box-shadow var(--transition);
+            position: relative;
+        }
+
+        .sport-card:hover, .sport-card:focus-within {
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-md);
+        }
+
+        .sport-card.inactive {
+            opacity: 0.6;
+            pointer-events: none;
+        }
+
+        .sport-image {
+            height: clamp(120px, 30vw, 160px);
+            background-size: cover;
+            background-position: center;
+            position: relative;
+        }
+
+        .sport-image::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(135deg, var(--dark-overlay), rgba(74, 23, 23, 0.3));
+        }
+
+        .sport-image.inactive {
+            filter: grayscale(100%);
+        }
+
+        .sport-image.football {
+            background-image: url('https://images.unsplash.com/photo-1431324155629-1a6deb1dec8d?w=400&h=300&fit=crop');
+        }
+
+        .sport-image.kabaddi {
+            background-image: url('https://wallpapers.com/images/hd/intense-kabaddi-game-71do0nby8ox8ie4x.jpg');
+        }
+
+        .sport-image.basketball {
+            background-image: url('https://images.unsplash.com/photo-1546519638-68e109498ffc?w=400&h=300&fit=crop');
+        }
+
+        .sport-image.badminton {
+            background-image: url('https://images.unsplash.com/photo-1626224583764-f87db24ac4ea?w=400&h=300&fit=crop');
+        }
+
+        .sport-image.cricket {
+            background-image: url('https://images.unsplash.com/photo-1593168790117-fb6f5e6b3f7a?w=400&h=300&fit=crop');
+        }
+
+        .sport-image.volleyball {
+            background-image: url('https://images.unsplash.com/photo-1612872087720-4db0b76b098e?w=400&h=300&fit=crop');
+        }
+
+        .sport-image.throwball {
+            background-image: url('https://images.unsplash.com/photo-1593168790117-fb6f5e6b3f7a?w=400&h=300&fit=crop'); /* Placeholder, same as cricket */
+        }
+
+        .sport-image.khokho {
+            background-image: url('https://images.unsplash.com/photo-1593168790117-fb6f5e6b3f7a?w=400&h=300&fit=crop'); /* Placeholder, same as cricket */
+        }
+
+        .sport-overlay {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: var(--text-light);
+            font-size: clamp(1.5rem, 5vw, 2rem);
+            font-weight: bold;
+            text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.7);
+        }
+
+        .sport-overlay.inactive::after {
+            content: 'Coming Soon';
+            display: block;
+            font-size: clamp(0.7rem, 2vw, 0.9rem);
+            background: rgba(0, 0, 0, 0.7);
+            padding: 0.3rem 0.6rem;
+            border-radius: 10px;
+            margin-top: 0.5rem;
+            text-shadow: none;
+        }
+
+        .sport-content {
+            padding: clamp(0.8rem, 2vw, 1rem);
+            text-align: center;
+        }
+
+        .sport-title {
+            font-size: clamp(1rem, 3vw, 1.2rem);
+            font-weight: bold;
+            color: var(--primary-maroon);
+            margin-bottom: clamp(0.4rem, 1vw, 0.5rem);
+        }
+
+        .sport-description {
+            color: #666;
+            font-size: clamp(0.75rem, 2vw, 0.85rem);
+            margin-bottom: clamp(0.8rem, 2vw, 1rem);
+        }
+
+        .sport-link {
+            background: linear-gradient(135deg, var(--primary-gold), var(--secondary-gold));
+            color: var(--primary-maroon);
+            padding: clamp(0.5rem, 1.5vw, 0.6rem) clamp(1rem, 2.5vw, 1.2rem);
+            text-decoration: none;
+            border-radius: 20px;
+            font-weight: bold;
+            font-size: clamp(0.75rem, 2vw, 0.85rem);
+            transition: transform var(--transition);
+        }
+
+        .sport-link:hover, .sport-link:focus {
+            transform: scale(1.05);
+        }
+
+        .sport-link.inactive {
+            display: none;
+        }
+
+        /* Flash Messages */
+        .flash-message {
+            background: linear-gradient(135deg, var(--secondary-gold), var(--primary-gold));
+            color: var(--primary-maroon);
+            padding: clamp(0.5rem, 1.5vw, 0.7rem) clamp(1rem, 2.5vw, 1.2rem);
+            border-radius: 6px;
+            margin-bottom: clamp(0.8rem, 2vw, 1.2rem);
+            text-align: center;
+            font-weight: bold;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .error-message {
+            background: linear-gradient(135deg, #e63946, #d62839);
+            color: var(--text-light);
+            padding: clamp(0.5rem, 1.5vw, 0.7rem) clamp(1rem, 2.5vw, 1.2rem);
+            border-radius: 6px;
+            margin-bottom: clamp(0.8rem, 2vw, 1.2rem);
+            text-align: center;
+            font-weight: bold;
+            box-shadow: var(--shadow-sm);
+        }
+
+        /* Organizers Section */
+        .organizers-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: clamp(0.8rem, 2vw, 1.5rem);
+            margin-top: clamp(0.8rem, 2vw, 1.5rem);
+        }
+
+        .organizer-card {
+            background: var(--white);
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: var(--shadow-sm);
+            transition: transform var(--transition), box-shadow var(--transition);
+            text-align: center;
+        }
+
+        .organizer-card:hover, .organizer-card:focus-within {
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-md);
+        }
+
+        .organizer-photo {
+            width: clamp(80px, 20vw, 100px);
+            height: clamp(80px, 20vw, 100px);
+            border-radius: 50%;
+            margin: clamp(0.8rem, 2vw, 1.2rem) auto clamp(0.5rem, 1.5vw, 0.8rem);
+            overflow: hidden;
+            border: 2px solid var(--primary-gold);
+        }
+
+        .organizer-photo img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .organizer-info {
+            padding: 0 clamp(0.8rem, 2vw, 1rem) clamp(0.8rem, 2vw, 1.2rem);
+        }
+
+        .organizer-name {
+            font-size: clamp(1rem, 2.5vw, 1.2rem);
+            font-weight: 700;
+            color: var(--primary-maroon);
+            margin-bottom: clamp(0.4rem, 1vw, 0.5rem);
+        }
+
+        .organizer-title {
+            font-size: clamp(0.75rem, 2vw, 0.9rem);
+            font-weight: 600;
+            color: var(--primary-gold);
+            text-transform: uppercase;
+        }
+
+        /* Footer */
+        .footer {
+            background: linear-gradient(135deg, var(--primary-maroon), #6a2525);
+            color: var(--text-light);
+            padding: clamp(1rem, 3vw, 2rem) clamp(0.8rem, 3vw, 1.2rem);
+            margin-top: auto;
+        }
+
+        .footer-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            text-align: center;
+        }
+
+        .footer-logo {
+            font-size: clamp(1rem, 3vw, 1.6rem);
+            font-weight: bold;
+            color: var(--secondary-gold);
+            margin-bottom: clamp(0.8rem, 2vw, 1rem);
+        }
+
+        .footer-links {
+            display: flex;
+            justify-content: center;
+            gap: clamp(0.5rem, 2vw, 1rem);
+            margin-bottom: clamp(0.8rem, 2vw, 1rem);
+            flex-wrap: wrap;
+        }
+
+        .footer-links a {
+            color: var(--text-light);
+            text-decoration: none;
+            padding: clamp(0.3rem, 1vw, 0.4rem);
+            transition: color var(--transition);
+            font-size: clamp(0.8rem, 2.5vw, 0.9rem);
+        }
+
+        .footer-links a:hover, .footer-links a:focus {
+            color: var(--secondary-gold);
+        }
+
+        .footer-bottom {
+            border-top: 1px solid rgba(255, 255, 255, 0.2);
+            padding-top: clamp(0.5rem, 1.5vw, 0.8rem);
+            font-size: clamp(0.75rem, 2vw, 0.85rem);
+            opacity: 0.8;
+        }
+
+        /* Responsive Design */
+        @media (min-width: 768px) {
+            .hero-container {
+                grid-template-columns: 1fr 1fr;
+            }
+
+            .hero-content {
+                text-align: left;
+            }
+
+            .hero-buttons {
+                justify-content: flex-start;
+            }
+
+            .hero-stats {
+                margin-top: 0;
+            }
+        }
+
+        @media (max-width: 1024px) {
+            .header-content {
+                flex-direction: column;
+                gap: clamp(0.5rem, 2vw, 0.8rem);
+                align-items: center;
+            }
+
+            .sports-grid, .organizers-grid {
+                grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            }
+        }
+
+        @media (max-width: 768px) {
+            .nav {
+                justify-content: center;
+            }
+
+            .sports-grid, .organizers-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .section {
+                padding: clamp(0.8rem, 2vw, 1.2rem);
+            }
+
+            .footer-links {
+                flex-direction: column;
+                gap: clamp(0.3rem, 1vw, 0.5rem);
+            }
+        }
+
+        @media (max-width: 480px) {
+            .hero {
+                padding: clamp(1.5rem, 5vw, 2rem) clamp(0.5rem, 2vw, 0.8rem);
+            }
+
+            .hero h1 {
+                font-size: clamp(1.2rem, 4vw, 1.8rem);
+            }
+
+            .hero-description {
+                font-size: clamp(0.75rem, 2vw, 0.85rem);
+            }
+
+            .sport-image {
+                height: clamp(100px, 25vw, 120px);
+            }
+
+            .container {
+                padding: clamp(0.8rem, 2vw, 1rem) clamp(0.5rem, 2vw, 0.8rem);
+            }
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="header-content">
+            <div class="logo" aria-label="GM League Season 2 Logo">🏆 GM League S2</div>
+            <nav class="nav">
+                <a href="#register" aria-label="Register for GM League">Register</a>
+                <a href="#contact" aria-label="Contact the GM League Team">Contact Team</a>
+            </nav>
+        </div>
+    </header>
+
+    <main>
+        <section class="hero">
+            <div class="hero-container">
+                <div class="hero-content">
+                    <div class="hero-badge">🏆 Season 2 Now Live</div>
+                    <h1>GM League Championship</h1>
+                    <p class="hero-description">
+                        Experience the ultimate inter-collegiate sports tournament where talent meets opportunity. 
+                        Join thousands of athletes competing across multiple sports categories.
+                    </p>
+                    <div class="hero-buttons">
+                        <a href="#register" class="cta-button" aria-label="Register as a Player">Register Now</a>
+                        <a href="{{ url_for('team_owner_registration') }}" class="cta-button" aria-label="Register as a Team Owner">Register as Team Owner</a>
+                    </div>
+                </div>
+                <div class="hero-visual">
+                    <div class="hero-stats">
+                        <div class="stat-item">
+                            <span class="stat-number">500+</span>
+                            <span class="stat-label">Athletes</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-number">4</span>
+                            <span class="stat-label">Sports</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-number">50+</span>
+                            <span class="stat-label">Teams</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-number">$</span>
+                            <span class="stat-label">Prize Pool</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <div class="container">
+            {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+            <div>
+                {% for category, message in messages %}
+                <div class="{% if category == 'success' %}flash-message{% else %}error-message{% endif %}">
+                    {{ message }}
+                </div>
+                {% endfor %}
+            </div>
+            {% endif %}
+            {% endwith %}
+
+            <section id="register" class="section player-registration">
+                <h2>🎮 Register as a Player</h2>
+                <div class="sports-grid">
+                    <div class="sport-card">
+                        <div class="sport-image football">
+                            <div class="sport-overlay">⚽</div>
+                        </div>
+                        <div class="sport-content">
+                            <div class="sport-title">Football</div>
+                            <p class="sport-description">The beautiful game that unites nations and ignites passion worldwide.</p>
+                            <a href="{{ url_for('register_player', sport='football') }}" class="sport-link" aria-label="Register as a Football Player">Register as a Player</a>
+                        </div>
+                    </div>
+                    <div class="sport-card">
+                        <div class="sport-image kabaddi">
+                            <div class="sport-overlay">🤼</div>
+                        </div>
+                        <div class="sport-content">
+                            <div class="sport-title">Kabaddi</div>
+                            <p class="sport-description">Ancient sport of strength, strategy, and lightning-fast reflexes.</p>
+                            <a href="{{ url_for('register_player', sport='kabaddi') }}" class="sport-link" aria-label="Register as a Kabaddi Player">Register as a Player</a>
+                        </div>
+                    </div>
+                    <div class="sport-card">
+                        <div class="sport-image basketball">
+                            <div class="sport-overlay">🏀</div>
+                        </div>
+                        <div class="sport-content">
+                            <div class="sport-title">Basketball</div>
+                            <p class="sport-description">High-flying action and precision shooting in the ultimate court battle.</p>
+                            <a href="{{ url_for('register_player', sport='basketball') }}" class="sport-link" aria-label="Register as a Basketball Player">Register as a Player</a>
+                        </div>
+                    </div>
+                    <div class="sport-card">
+                        <div class="sport-image badminton">
+                            <div class="sport-overlay">🏸</div>
+                        </div>
+                        <div class="sport-content">
+                            <div class="sport-title">Badminton</div>
+                            <p class="sport-description">Speed, agility, and precision in the fastest racket sport.</p>
+                            <a href="{{ url_for('register_player', sport='badminton') }}" class="sport-link" aria-label="Register as a Badminton Player">Register as a Player</a>
+                        </div>
+                    </div>
+                    <div class="sport-card inactive">
+                        <div class="sport-image cricket inactive">
+                            <div class="sport-overlay inactive">🏏</div>
+                        </div>
+                        <div class="sport-content">
+                            <div class="sport-title">Cricket</div>
+                            <p class="sport-description">A game of strategy and skill, loved by millions across the globe.</p>
+                            <span class="sport-link inactive" aria-hidden="true">Coming Soon</span>
+                        </div>
+                    </div>
+                    <div class="sport-card inactive">
+                        <div class="sport-image volleyball inactive">
+                            <div class="sport-overlay inactive">🏐</div>
+                        </div>
+                        <div class="sport-content">
+                            <div class="sport-title">Volleyball</div>
+                            <p class="sport-description">Teamwork and power in fast-paced, high-energy rallies.</p>
+                            <span class="sport-link inactive" aria-hidden="true">Coming Soon</span>
+                        </div>
+                    </div>
+                    <div class="sport-card inactive">
+                        <div class="sport-image throwball inactive">
+                            <div class="sport-overlay inactive">🏀</div>
+                        </div>
+                        <div class="sport-content">
+                            <div class="sport-title">Throwball</div>
+                            <p class="sport-description">Dynamic and engaging, combining strength and coordination.</p>
+                            <span class="sport-link inactive" aria-hidden="true">Coming Soon</span>
+                        </div>
+                    </div>
+                    <div class="sport-card inactive">
+                        <div class="sport-image khokho inactive">
+                            <div class="sport-overlay inactive">🏃</div>
+                        </div>
+                        <div class="sport-content">
+                            <div class="sport-title">Kho-Kho</div>
+                            <p class="sport-description">A traditional sport of speed, agility, and tactical chases.</p>
+                            <span class="sport-link inactive" aria-hidden="true">Coming Soon</span>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section class="section organizers-section">
+                <h2>PATRON</h2>
+                <div class="organizers-grid">
+                    <div class="organizer-card">
+                        <div class="organizer-photo">
+                            <img src="{{ url_for('static', filename='photos/CHANCELLOR.jpg') }}" alt="G.M. Lingaraju">
+                        </div>
+                        <div class="organizer-info">
+                            <div class="organizer-name">G.M. Lingaraju</div>
+                            <div class="organizer-title">Chancellor</div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section class="section organizers-section">
+                <h2>ADVISORY COMMITTEE</h2>
+                <div class="organizers-grid">
+                    <div class="organizer-card">
+                        <div class="organizer-photo">
+                            <img src="{{ url_for('static', filename='photos/dr_sr_shankapal.jpg') }}" alt="Dr. S.R. Shankapal">
+                        </div>
+                        <div class="organizer-info">
+                            <div class="organizer-name">Dr. S.R. Shankapal</div>
+                            <div class="organizer-title">Vice Chancellor</div>
+                        </div>
+                    </div>
+                    <div class="organizer-card">
+                        <div class="organizer-photo">
+                            <img src="{{ url_for('static', filename='photos/dr_hd_maheshappa.jpg') }}" alt="Dr. H.D. Maheshappa">
+                        </div>
+                        <div class="organizer-info">
+                            <div class="organizer-name">Dr. H.D. Maheshappa</div>
+                            <div class="organizer-title">Pro-Vice Chancellor</div>
+                        </div>
+                    </div>
+                    <div class="organizer-card">
+                        <div class="organizer-photo">
+                            <img src="{{ url_for('static', filename='photos/dr_sunil_kumar_bs.jpg') }}" alt="Dr. Sunil Kumar B.S">
+                        </div>
+                        <div class="organizer-info">
+                            <div class="organizer-name">Dr. Sunil Kumar B.S</div>
+                            <div class="organizer-title">Registrar</div>
+                        </div>
+                    </div>
+                    <div class="organizer-card">
+                        <div class="organizer-photo">
+                            <img src="{{ url_for('static', filename='photos/dr_kiran_kumar_hs.png') }}" alt="Dr. Kiran Kumar H S">
+                        </div>
+                        <div class="organizer-info">
+                            <div class="organizer-name">Dr. Kiran Kumar H S</div>
+                            <div class="organizer-title">Director - SA</div>
+                        </div>
+                    </div>
+                    <div class="organizer-card">
+                        <div class="organizer-photo">
+                            <img src="{{ url_for('static', filename='photos/ajjaha_sir.png') }}" alt="Ajjaiah Sir">
+                        </div>
+                        <div class="organizer-info">
+                            <div class="organizer-name">Ajjaiah Sir</div>
+                            <div class="organizer-title">Director - PE</div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section class="section organizers-section">
+                <h2>Team</h2>
+                <div class="organizers-grid">
+                    <div class="organizer-card">
+                        <div class="organizer-photo">
+                            <img src="{{ url_for('static', filename='photos/guru.jpEg') }}" alt="Gurushankar AS">
+                        </div>
+                        <div class="organizer-info">
+                            <div class="organizer-name">Gurushankar AS</div>
+                            <div class="organizer-title">Sports Secretary</div>
+                        </div>
+                    </div>
+                    <div class="organizer-card">
+                        <div class="organizer-photo">
+                            <img src="{{ url_for('static', filename='photos/kumar.jpg') }}" alt="Kumar M">
+                        </div>
+                        <div class="organizer-info">
+                            <div class="organizer-name">Kumar M</div>
+                            <div class="organizer-title">Sports Secretary</div>
+                        </div>
+                    </div>
+                    <div class="organizer-card">
+                        <div class="organizer-photo">
+                            <img src="{{ url_for('static', filename='photos/abhiram_naik.jpg') }}" alt="Abhiram Girish Naik">
+                        </div>
+                        <div class="organizer-info">
+                            <div class="organizer-name">Abhiram Girish Naik</div>
+                            <div class="organizer-title">Technical Lead</div>
+                        </div>
+                    </div>
+                    <div class="organizer-card">
+                        <div class="organizer-photo">
+                            <img src="{{ url_for('static', filename='photos/rahul.jpg') }}" alt="Rahul R Gadgimata">
+                        </div>
+                        <div class="organizer-info">
+                            <div class="organizer-name">Rahul R Gadgimata</div>
+                            <div class="organizer-title">Core Member</div>
+                        </div>
+                    </div>
+                    <div class="organizer-card">
+                        <div class="organizer-photo">
+                            <img src="{{ url_for('static', filename='photos/sudarshana.jpeg') }}" alt="Sudarshana V D">
+                        </div>
+                        <div class="organizer-info">
+                            <div class="organizer-name">Sudarshana V D</div>
+                            <div class="organizer-title">Core Member</div>
+                        </div>
+                    </div>
+                    <div class="organizer-card">
+                        <div class="organizer-photo">
+                            <img src="{{ url_for('static', filename='photos/Prajwal_Jana.jpeg') }}" alt="Prajwal Jana">
+                        </div>
+                        <div class="organizer-info">
+                            <div class="organizer-name">Prajwal Jana</div>
+                            <div class="organizer-title">Core Member</div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+
+         <!-- <section>
+<h2>Bid on Players</h2>
+        <div>
+            <a href="{{ url_for('bidding', sport='football', gender='male') }}" aria-label="Bid on Football Men's Team">Football (Men)</a>
+            <a href="{{ url_for('bidding', sport='kabaddi', gender='male') }}" aria-label="Bid on Kabaddi Men's Team">Kabaddi (Men)</a>
+            <a href="{{ url_for('bidding', sport='kabaddi', gender='female') }}" aria-label="Bid on Kabaddi Women's Team">Kabaddi (Women)</a>
+            <a href="{{ url_for('bidding', sport='basketball', gender='male') }}" aria-label="Bid on Basketball Men's Team">Basketball (Men)</a>
+            <a href="{{ url_for('bidding', sport='basketball', gender='female') }}" aria-label="Bid on Basketball Women's Team">Basketball (Women)</a>
+            <a href="{{ url_for('bidding', sport='badminton', gender='male') }}" aria-label="Bid on Badminton Men's Team">Badminton (Men)</a>
+            <a href="{{ url_for('bidding', sport='badminton', gender='female') }}" aria-label="Bid on Badminton Women's Team">Badminton (Women)</a>
+        </div>
+     </section> 
+    <section>
+        <h2>Get Involved</h2>
+        <div>
+            <a href="{{ url_for('team_owner_registration') }}" aria-label="Register as a Team Owner">Register as a Team Owner</a>
+            <a href="{{ url_for('admin_login') }}" aria-label="Admin Login">Admin Login</a>
+        </div>
+    </section>  -->
+    </main>
+
+    <footer class="footer" id="contact">
+        <div class="footer-content">
+            <div class="footer-logo" aria-label="GM League Season 2 Footer Logo">🏆 GM League Season 2</div>
+            <div class="footer-links">
+                <a href="#register" aria-label="Register for GM League">Register</a>
+                <a href="#contact" aria-label="Contact the GM League Team">Contact Team</a>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2025 GM University. All rights reserved. | Season 2 - Where Legends Are Born</p>
+            </div>
+        </div>
+    </footer>
+</body>
+</html>

@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Admin Login</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .flash-message { color: green; font-weight: bold; }
+        .error-message { color: red; font-weight: bold; }
+        .form-container { max-width: 300px; border: 1px solid #ccc; padding: 15px; }
+    </style>
+</head>
+<body>
+    <h2>Admin Login</h2>
+
+    {% with messages = get_flashed_messages() %}
+        {% if messages %}
+            {% for message in messages %}
+                <p class="{% if 'successful' in message %}flash-message{% else %}error-message{% endif %}">{{ message }}</p>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+
+    <div class="form-container">
+        <form method="POST" action="{{ url_for('admin_login') }}">
+            Username: <input type="text" name="username" required><br>
+            Password: <input type="password" name="password" required><br>
+            <input type="submit" value="Login">
+        </form>
+    </div>
+    <a href="{{ url_for('index') }}">Back to Home</a>
+</body>
+</html>

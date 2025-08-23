@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit Player</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100">
+    <div class="container mx-auto p-6">
+        <h1 class="text-3xl font-bold mb-6 text-center">Edit Player: {{ player.name }}</h1>
+
+        <!-- Flash Messages -->
+        {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+        <div class="mb-4">
+            {% for category, message in messages %}
+            <div class="p-4 rounded {{ 'bg-green-100 text-green-700' if category == 'success' else 'bg-red-100 text-red-700' }}">
+                {{ message }}
+            </div>
+            {% endfor %}
+        </div>
+        {% endwith %}
+
+        <form action="" method="POST" enctype="multipart/form-data" class="bg-white p-6 rounded-lg shadow">
+            <div class="mb-4">
+                <label class="block text-gray-700">Name:</label>
+                <input type="text" name="name" value="{{ player.name }}" class="w-full p-2 border rounded" required>
+            </div>
+            <div class="mb-4">
+                <label class="block text-gray-700">Sport:</label>
+                <select name="sport" class="w-full p-2 border rounded" required>
+                    <option value="Football" {{ 'selected' if player.sport == 'Football' }}>Football</option>
+                    <option value="Kabaddi" {{ 'selected' if player.sport == 'Kabaddi' }}>Kabaddi</option>
+                    <option value="Basketball" {{ 'selected' if player.sport == 'Basketball' }}>Basketball</option>
+                    <option value="Badminton" {{ 'selected' if player.sport == 'Badminton' }}>Badminton</option>
+                </select>
+            </div>
+            <div class="mb-4">
+                <label class="block text-gray-700">Position:</label>
+                <select name="position" class="w-full p-2 border rounded" {{ 'disabled' if player.sport == 'Badminton' }}>
+                    {% for pos in positions %}
+                    <option value="{{ pos }}" {{ 'selected' if player.position == pos }}>{{ pos }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="mb-4">
+                <label class="block text-gray-700">Branch:</label>
+                <input type="text" name="branch" value="{{ player.branch or '' }}" class="w-full p-2 border rounded">
+            </div>
+            <div class="mb-4">
+                <label class="block text-gray-700">USN:</label>
+                <input type="text" name="usn" value="{{ player.usn or '' }}" class="w-full p-2 border rounded">
+            </div>
+            <div class="mb-4">
+                <label class="block text-gray-700">College Name:</label>
+                <input type="text" name="college_name" value="{{ player.college_name or '' }}" class="w-full p-2 border rounded">
+            </div>
+            <div class="mb-4">
+                <label class="block text-gray-700">Contact:</label>
+                <input type="text" name="contact" value="{{ player.contact or '' }}" class="w-full p-2 border rounded">
+            </div>
+            <div class="mb-4">
+                <label class="block text-gray-700">Achievements:</label>
+                <textarea name="achievements" class="w-full p-2 border rounded">{{ player.achievements or '' }}</textarea>
+            </div>
+            <div class="mb-4">
+                <label class="block text-gray-700">Experience:</label>
+                <input type="text" name="experience" value="{{ player.experience }}" class="w-full p-2 border rounded" required>
+            </div>
+            <div class="mb-4">
+                <label class="block text-gray-700">Gender:</label>
+                <select name="gender" class="w-full p-2 border rounded" required>
+                    <option value="Male" {{ 'selected' if player.gender == 'Male' }}>Male</option>
+                    <option value="Female" {{ 'selected' if player.gender == 'Female' }}>Female</option>
+                </select>
+            </div>
+            <div class="mb-4">
+                <label class="block text-gray-700">Photo:</label>
+                <input type="file" name="photo" class="w-full p-2 border rounded">
+                {% if player.photo %}
+                <img src="{{ '/static/' + player.photo }}" alt="{{ player.name }} Photo" class="mt-2 max-h-40">
+                {% endif %}
+            </div>
+            <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">Save Changes</button>
+            <a href="{{ url_for('admin_dashboard') }}" class="ml-4 text-red-500 hover:underline">Cancel</a>
+        </form>
+    </div>
+</body>
+</html>

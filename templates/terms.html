@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Terms and Conditions - GM League Season 2</title>
+    <style>
+        :root {
+            --primary-maroon: #4a1717;
+            --primary-gold: #d4a017;
+            --secondary-gold: #f1c453;
+            --background-dark: #f0e9e9;
+            --white: #ffffff;
+        }
+
+        html, body, div, section, a, p, h1, ul, li {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background: var(--background-dark);
+            color: var(--primary-maroon);
+            font-family: 'Arial', sans-serif;
+            line-height: 1.6;
+        }
+
+        /* Main Content */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: clamp(2rem, 5vw, 4rem) clamp(1rem, 3vw, 2rem);
+        }
+
+        .terms-section {
+            background: var(--white);
+            padding: clamp(2rem, 5vw, 3rem);
+            margin-bottom: 2rem;
+            border-radius: 15px;
+        }
+
+        h1 {
+            font-size: clamp(1.8rem, 4vw, 2.5rem);
+            color: var(--primary-maroon);
+            margin-bottom: 1.5rem;
+            text-align: center;
+        }
+
+        h1::after {
+            content: '';
+            display: block;
+            width: 80px;
+            height: 4px;
+            background: linear-gradient(90deg, var(--primary-gold), var(--secondary-gold));
+            margin: 0.8rem auto;
+            border-radius: 2px;
+        }
+
+        p {
+            font-size: clamp(1rem, 2.5vw, 1.2rem);
+            color: #666;
+            margin-bottom: 1.5rem;
+            text-align: justify;
+        }
+
+        ul {
+            list-style-type: disc;
+            padding-left: 2rem;
+            margin-bottom: 1.5rem;
+        }
+
+        li {
+            font-size: clamp(0.9rem, 2vw, 1.1rem);
+            color: #666;
+            margin-bottom: 0.8rem;
+        }
+
+        .back-link {
+            display: inline-block;
+            background: linear-gradient(135deg, var(--primary-gold), var(--secondary-gold));
+            color: var(--primary-maroon);
+            padding: 0.7rem 1.5rem;
+            text-decoration: none;
+            border-radius: 20px;
+            font-weight: bold;
+            font-size: 0.9rem;
+            transition: transform 0.3s;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .back-link:hover, .back-link:focus {
+            transform: scale(1.05);
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .terms-section {
+                padding: 1.5rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .container {
+                padding: 1.5rem 0.8rem;
+            }
+
+            h1 {
+                font-size: clamp(1.5rem, 6vw, 2rem);
+            }
+
+            p, li {
+                font-size: clamp(0.8rem, 2.5vw, 1rem);
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Terms and Conditions Section -->
+    <div class="container">
+        <section class="terms-section">
+            <h1>Terms and Conditions</h1>
+            <p>Welcome to the GM League. By participating in our platform, you agree to the following terms and conditions:</p>
+   <ul>
+    <li>All participants must provide accurate information during registration.</li>
+    <li>Team owners are responsible for managing their team budgets and bids responsibly.</li>
+    <li>The League Admin reserves the right to reset bids or update player details if required.</li>
+    <li>Any misuse of the platform, unfair practices, or violations of rules may lead to disqualification.</li>
+    <li>Photos uploaded must be appropriate and relevant to the registered player or team.</li>
+
+</ul>
+
+            <p>For any queries or support, please contact the League Admin at 📱 6363962653..</p>
+            <a href="{{ url_for('index') }}" class="back-link" aria-label="Back to Home Page">Back to Home</a>
+        </section>
+    </div>
+</body>
+</html>

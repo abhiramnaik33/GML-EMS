@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit Team Owner</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100">
+    <div class="container mx-auto p-6">
+        <h1 class="text-3xl font-bold mb-6 text-center">Edit Team Owner: {{ owner.team_name }}</h1>
+
+        <!-- Flash Messages -->
+        {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+        <div class="mb-4">
+            {% for category, message in messages %}
+            <div class="p-4 rounded {{ 'bg-green-100 text-green-700' if category == 'success' else 'bg-red-100 text-red-700' }}">
+                {{ message }}
+            </div>
+            {% endfor %}
+        </div>
+        {% endwith %}
+
+        <form action="" method="POST" enctype="multipart/form-data" class="bg-white p-6 rounded-lg shadow">
+            <div class="mb-4">
+                <label class="block text-gray-700">Name:</label>
+                <input type="text" name="name" value="{{ owner.name }}" class="w-full p-2 border rounded" required>
+            </div>
+            <div class="mb-4">
+                <label class="block text-gray-700">Team Name:</label>
+                <input type="text" name="team_name" value="{{ owner.team_name }}" class="w-full p-2 border rounded" required>
+            </div>
+            <div class="mb-4">
+                <label class="block text-gray-700">Sports:</label>
+                <div class="grid grid-cols-2 gap-2">
+                    {% for sport in sports %}
+                    <label class="flex items-center">
+                        <input type="checkbox" name="sports" value="{{ sport }}" {{ 'checked' if sport in owner.sports.split(',') }}>
+                        {{ sport }}
+                    </label>
+                    {% endfor %}
+                </div>
+            </div>
+            <div class="mb-4">
+                <label class="block text-gray-700">Budget:</label>
+                <input type="number" name="budget" value="{{ owner.budget }}" class="w-full p-2 border rounded" required>
+            </div>
+            <div class="mb-4">
+                <label class="block text-gray-700">Contact:</label>
+                <input type="text" name="contact" value="{{ owner.contact or '' }}" class="w-full p-2 border rounded">
+            </div>
+            <div class="mb-4">
+                <label class="block text-gray-700">Designation:</label>
+                <input type="text" name="designation" value="{{ owner.designation or '' }}" class="w-full p-2 border rounded">
+            </div>
+            <div class="mb-4">
+                <label class="block text-gray-700">Email:</label>
+                <input type="email" name="email" value="{{ owner.email or '' }}" class="w-full p-2 border rounded">
+            </div>
+            <div class="mb-4">
+                <label class="block text-gray-700">Manager Name:</label>
+                <input type="text" name="manager_name" value="{{ owner.manager_name or '' }}" class="w-full p-2 border rounded">
+            </div>
+            <div class="mb-4">
+                <label class="block text-gray-700">Manager Contact Number:</label>
+                <input type="text" name="manager_contact_number" value="{{ owner.manager_contact_number or '' }}" class="w-full p-2 border rounded">
+            </div>
+            <div class="mb-4">
+                <label class="block text-gray-700">Team Logo:</label>
+                <input type="file" name="team_logo" class="w-full p-2 border rounded">
+                {% if owner.team_logo %}
+                <img src="{{ '/static/' + owner.team_logo }}" alt="{{ owner.team_name }} Logo" class="mt-2 max-h-40">
+                {% endif %}
+            </div>
+            <div class="mb-4">
+                <label class="block text-gray-700">Team Owner Photo:</label>
+                <input type="file" name="team_owner_photo" class="w-full p-2 border rounded">
+                {% if owner.team_owner_photo %}
+                <img src="{{ '/static/' + owner.team_owner_photo }}" alt="{{ owner.name }} Photo" class="mt-2 max-h-40">
+                {% endif %}
+            </div>
+            <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">Save Changes</button>
+            <a href="{{ url_for('admin_dashboard') }}" class="ml-4 text-red-500 hover:underline">Cancel</a>
+        </form>
+    </div>
+</body>
+</html>
