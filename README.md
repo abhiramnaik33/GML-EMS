@@ -1,59 +1,127 @@
+
 # GM League - Sports Bidding & Management System
 
 ## 📌 Project Overview
 The **GM League Management System** is a web-based platform developed for managing sports leagues at **GM University**.  
 
-It provides:  
-- ✅ Team Owner registration and login  
-- ✅ Player registration with details (name, branch, year, skill level, etc.)  
-- ✅ Player bidding system (team owners can bid for players)  
-- ✅ Dynamic budget management for teams (remaining balance shown after each bid)  
-- ✅ Admin monitoring of bidding & player allocations  
+This platform is designed to streamline sports event management, registration, and bidding processes.  
 
-This system is designed to organize tournaments like:  
-⚽ Football | 🏏 Cricket | 🏀 Basketball | 🏐 Volleyball | 🤼 Kabaddi | 🤾 Throwball | 🏸 Shuttle Badminton | 🏃 Kho-Kho  
+### ✅ Features
+- **Team Owner Registration & Login** – Secure authentication for team owners.  
+- **Player Registration** – Players can register with details like **Name, Branch, Year, Skill Level, and Sport**.  
+- **Player Bidding System** – Team owners can bid for registered players during auctions.  
+- **Dynamic Budget Management** – Each team has a predefined budget; the remaining amount is updated after every bid.  
+- **Admin Panel** – Admins can monitor bidding, player allocations, and reset or update details if required.  
+- **Multi-Sport Support** – Can be used for tournaments like:  
+  - 🏏 Cricket  
+  - ⚽ Football  
+  - 🏀 Basketball  
+  - 🏐 Volleyball  
+  - 🤾 Kabaddi  
+  - 🤸 Throwball  
+  - 🏸 Shuttle Badminton  
+  - 🏃 Kho-Kho  
 
 ---
 
 ## 🛠️ Tech Stack
-- **Frontend:** HTML, CSS (Tailwind), JavaScript  
-- **Backend:** Python (Flask)  
-- **Database:** SQLite / MySQL  
-- **Tools:** SQLAlchemy ORM, Jinja2 Templates  
+- **Frontend**: HTML, CSS, JavaScript, Tailwind  
+- **Backend**: Python (Flask)  
+- **Database**: SQLite (can be upgraded to MySQL/PostgreSQL)  
+- **Other Tools**: Jinja2 templating, SQLAlchemy ORM  
 
 ---
 
-## 🚀 Features
-1. **Player Management** – Players can register with details like name, age, branch, year of study, and skill level.  
-2. **Bidding System** – Team owners can bid for players in real-time.  
-3. **Budget Tracking** – Each team has a fixed budget. The system automatically deducts bid prices and shows the **remaining balance**.  
-4. **Admin Dashboard** – Admin can monitor registrations, bids, and manage teams/players.  
-5. **Tournament Ready** – Supports multiple sports seasons with different games.  
+## 🚀 How It Works
+1. **Player Registration**  
+   - Players register by filling out a form with their details.  
+   - Data is stored in the database.  
+
+2. **Team Owner Registration & Login**  
+   - Team owners sign up and receive an initial **budget**.  
+   - Owners log in to access the bidding system.  
+
+3. **Bidding System**  
+   - A list of available players is displayed.  
+   - Team owners place bids within their budget.  
+   - The system dynamically updates **remaining budget** after each purchase.  
+
+4. **Admin Panel**  
+   - Admin can view all registered teams, players, and bidding history.  
+   - Admins have the ability to reset auctions or override allocations if needed.  
 
 ---
 
 ## 📂 Project Structure
-/GM-League
-│── app.py # Main Flask application
-│── /templates # HTML templates
-│── /static # CSS, JS, Images
-│── /database # Database files
-│── /uploads # Player photos
-│── README.md # Documentation
+```
+
+GM-League/
+│── app.py                # Main Flask application
+│── templates/            # HTML Templates (Frontend)
+│   ├── index.html
+│   ├── register\_player.html
+│   ├── register\_owner.html
+│   ├── bidding.html
+│   ├── dashboard.html
+│── static/               # CSS, JS, Images
+│── database.db           # SQLite Database (auto-created)
+│── README.md             # Project Documentation
+
+````
 
 
----
 
-## 👨‍💻 Contributors
-- **Abhiram Girish Naik** – Project Lead & Developer  
-
----
-
-## ⚡ How to Run
-1. Clone this repository  
+## ⚡ Installation & Setup
+1. Clone this repository:
    ```bash
-   git clone https://github.com/your-username/gm-league.git
-   cd gm-league
-2.pip install -r requirements.txt
-3.python app.py
-4.Open in browser: http://127.0.0.1:xxxx/
+   git clone https://github.com/your-username/GM-League.git
+   cd GM-League
+
+
+2. Create a virtual environment & activate it:
+
+   ```bash
+   python -m venv venv
+   source venv/bin/activate   # (Linux/Mac)
+   venv\Scripts\activate      # (Windows)
+   ```
+
+3. Install dependencies:
+
+   ```bash
+   pip install -r requirements.txt
+   ```
+
+4. Run the application:
+
+   ```bash
+   python app.py
+   ```
+
+5. Open in browser:
+
+   ```
+   http://127.0.0.1:5000
+   ```
+
+---
+
+## 📊 Future Enhancements
+
+* Live auction updates using WebSockets.
+* Export bidding data to Excel/PDF.
+* Notifications for team owners.
+* Multi-admin role support.
+* Cloud deployment with PostgreSQL.
+
+---
+
+
+
+
+
+* **Abhiram Girish Naik** – Project Lead & Developer
+
+---
+
+```
