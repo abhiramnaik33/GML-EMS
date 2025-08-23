@@ -116,12 +116,3 @@ GM-League/
 
 ---
 
-
-
-
-
-* **Abhiram Girish Naik** – Project Lead & Developer
-
----
-
-```
